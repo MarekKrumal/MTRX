@@ -14,7 +14,7 @@ const postSchema = mongoose.Schema({
         type: String,
     },
     likes: {
-        type: Nummber,
+        type: Number,
         default:0,
     },
     replies: [
@@ -37,7 +37,7 @@ const postSchema = mongoose.Schema({
         }
     ]
 },{
-    timestamps: true
+    timestamps: true,
 })
 
 const Post = mongoose.model("Post", postSchema);

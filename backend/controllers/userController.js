@@ -1,8 +1,11 @@
 import User from "../models/userModel.js"
+import Post from "../models/postModel.js";
+import bcrypt from "bcryptjs"
+import mongoose from "mongoose";
 
 const signupUser = async(req,res) => {
     try {
-        const {name,email,usermame,password} = req.body;
+        const {name,email,username,password} = req.body;
         const user = await User.findOne({$or:[{ email },{ username }]});
 
         if (user) {
@@ -35,7 +38,7 @@ const signupUser = async(req,res) => {
 
     } catch (error) {
         res.status(500).json({ message: error.message })
-        console.log("Error in signupUser: ", err.message)
+        console.log("Error in signupUser: ", error.message)
     }
 }
 
