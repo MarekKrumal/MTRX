@@ -4,6 +4,21 @@ import bcrypt from "bcryptjs"
 import mongoose from "mongoose";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAndSetCookie.js";
 
+
+const getUserProfile = async (req, res) =>{
+	const { username } = req.params;
+	try {
+		const user = await User.findOne({ username }).select("-password").select("-updatedAt");
+		if(!user) return res.status(400).json({ message: "User not found" });
+		
+		res.status(200).json(user);
+	} catch (err) {
+		res.status(500).json({ message: err.message});
+		console.log("Error in getUserProfile: ", err.message);
+	}
+}
+
+
 const signupUser = async(req,res) => {
     try {
         const {name,email,username,password} = req.body;
@@ -108,4 +123,35 @@ const followUnFollowUser = async (req, res) => {
 	}
 }
 
-export { signupUser, loginUser, logoutUser, followUnFollowUser }
+const updateUser = async (req, res) => {
+	const { name, email, username, password, profilePic, bio} = req.body;
+	const userId = req.user._id;
+	try {
+		let user = await User.findById(userId)
+		if (!user) return res.status(400).json({ message: "User not found" });
+
+		if(req.params.id !== userId.toString()) return res.status(400).json({ message: "You cannot update other users profile" });
+
+		if(password){
+			const salt = await bcrypt.genSalt(10);
+			const hashedPassword = await bcrypt.hash(password, salt);
+			user.password = hashedPassword;
+		}
+		user.name = name || user.name;
+		user.email = email || user.email;
+		user.username = username || user.username;
+		user.profilePic = profilePic || user.profilePic;
+		user.bio = bio || user.bio;
+
+		user = await user.save();
+
+		res.status(200).json({ message: "Profile updated successfully",user });
+
+	} catch (err) {
+		res.status(500).json({ error: err.message });
+		console.log("Error in updateUser: ", err.message);
+	}
+
+}
+
+export { signupUser, loginUser, logoutUser, followUnFollowUser, updateUser, getUserProfile }

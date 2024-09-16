@@ -11,7 +11,7 @@ const protectRoute = async (req, res, next) => {
 
         const user = await User.findById(decoded.userId).select("-password"); // a dostaneme userId z databaze kdyz user existuje to znamena ze pozadavek byl succesful
 
-        req.user = user; // v request predame toho usera a zavolame dalsi funkci followUnfullowUser
+        req.user = user; // v request predame ten user a zavolame dalsi funkci followUnfullowUser
 
         next();
     } catch (err) {
