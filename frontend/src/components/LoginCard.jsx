@@ -18,6 +18,7 @@ import {
 import authScreenAtom from '../atoms/authAtom';
 import { useSetRecoilState } from 'recoil';
 import useShowToast from '../../hooks/useShowToast';
+import userAtom from '../atoms/userAtom';
   
   
   // https://chakra-templates.vercel.app/forms/authentication
@@ -25,6 +26,7 @@ import useShowToast from '../../hooks/useShowToast';
   export default function LoginCard() {
     const [showPassword, setShowPassword] = useState(false);
     const setAuthScreen = useSetRecoilState(authScreenAtom);
+    const setUser = useSetRecoilState(userAtom);
     const [inputs, setInputs] = useState({
       username: "",
       password: "",
@@ -40,7 +42,13 @@ import useShowToast from '../../hooks/useShowToast';
           body: JSON.stringify(inputs),
         })
         const data = await res.json();
-        console.log(data);
+        if(data.error) {
+          showToast("Error", data.error, "error");
+          return;
+        }
+        console.log(data)
+        localStorage.setItem("user-threads", JSON.stringify(data));
+        setUser(data);
         
       } catch (error) {
         showToast("Error", error, "error");
