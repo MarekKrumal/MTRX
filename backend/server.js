@@ -20,8 +20,5 @@ app.use(cookieParser());
 app.use("/api/users", userRoutes)
 app.use("/api/posts", postRoutes)
 
-app.use((req, res, next) => {
-    res.status(404).send("Route not found");
-  });
 
-app.listen(5000, () => console.log(`Server started at http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Server started at http://localhost:${PORT}`));
