@@ -37,9 +37,9 @@ export default function SignupCard() {
   const showToast = useShowToast();
   const setUser = useSetRecoilState(userAtom);
 
-  const handleSignup = async () => {
+  const handleSignup = async () => {                             //nas state pro spravu registrace(signup)
     try {
-      const res = await fetch("/api/users/signup", {
+      const res = await fetch("/api/users/signup", {            // po kliknuti se provode tento fetch request
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -48,12 +48,12 @@ export default function SignupCard() {
       })
       const data = await res.json()
       
-      if (data.error){
+      if (data.error){                                           //pokud je nejaky error zachytime jej zde
         showToast("Error", data.error, "error");
         return;
       }
 
-      localStorage.setItem("user-threads", JSON.stringify(data));
+      localStorage.setItem("user-threads", JSON.stringify(data));//nastavujeme usera do nasi LocalStorage a updatujeme nas state (state je updejtovan v App.jsx)potom bude navigovan na HomePage
       setUser(data);
     } catch (error) {
       showToast("Error", data.error, "error");

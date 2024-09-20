@@ -28,7 +28,7 @@ const colors = {
   },
 }
 
-const theme = extendTheme({ config, styles, colors})
+const theme = extendTheme({ config, styles, colors}) // vytvorili jsme atom kazdy Atom je state a muzeme jej pouzit kdekoli - musime obalit nasi aplikaci v main.jsx do <RecoilRoot>
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

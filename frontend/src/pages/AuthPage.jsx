@@ -6,8 +6,7 @@ import SignupCard from "../components/SignupCard.jsx";
 const AuthPage = () => {
     const authScreenState = useRecoilValue(authScreenAtom);
     //const [value, setValue] = useState("login");
-  return <>{authScreenState === "login" ? <LoginCard /> : <SignupCard />}</>
-  
+  return <>{authScreenState === "login" ? <LoginCard /> : <SignupCard />}</>  // pukud jsme na login zobrazi se LoginCard else zobrazi se Signup card
 }
 
 export default AuthPage;
