@@ -14,6 +14,7 @@ import { useRecoilState } from 'recoil';
 import userAtom from '../atoms/userAtom';
 import { useRef, useState } from 'react';
 import usePreviewImg from '../hooks/usePreviewImg';
+import useShowToast from '../hooks/useShowToast';
 
 //https://chakra-templates.vercel.app/forms/authentication
 
@@ -29,10 +30,34 @@ export default function UpdateProfilePage() {
 
     const fileRef = useRef(null);
 
-    const { handleImageChange, imgUrl } = usePreviewImg() //kdyz zmenime image pomoci Buttonu(<Input type='file' hidden ref={fileRef}/>) tato funkce se spusti
+    const showToast = useShowToast();
 
+    const { handleImageChange, imgUrl } = usePreviewImg() //kdyz zmenime image pomoci Buttonu(<Input type='file' hidden ref={fileRef}/>) tato funkce se spusti
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      try {
+        const res = await fetch(`api/users/update/${user._id}`,{
+          method: "PUT",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({...inputs, profilePic:imgUrl}),
+        })
+        const data = await res.json(); //updejtovany user objekt
+        if(data.error){
+          showToast("Error", data.error, "error")
+          return;
+        }
+        showToast("Success", "Profile updated successfully", "success");
+        setUser(data);
+        localStorage.setItem("user-threads", JSON.stringify(data));
+      } catch (error) {
+        showToast("Error", error, "error")
+      }
+    }
 
   return (
+    <form onSubmit={handleSubmit}>
     <Flex
       align={'center'}
       justify={'center'}
@@ -63,7 +88,7 @@ export default function UpdateProfilePage() {
             </Center>
           </Stack>
         </FormControl>
-        <FormControl isRequired>
+        <FormControl>
           <FormLabel>Full name</FormLabel>
           <Input
             placeholder="Marek Krumal"
@@ -73,7 +98,7 @@ export default function UpdateProfilePage() {
             type="text"
           />
         </FormControl>
-        <FormControl isRequired>
+        <FormControl>
           <FormLabel>User name</FormLabel>
           <Input
             placeholder="Marek"
@@ -83,7 +108,7 @@ export default function UpdateProfilePage() {
             type="text"
           />
         </FormControl>
-        <FormControl isRequired>
+        <FormControl>
           <FormLabel>Email address</FormLabel>
           <Input
             placeholder="your-email@example.com"
@@ -93,17 +118,17 @@ export default function UpdateProfilePage() {
             type="email"
           />
         </FormControl>
-        <FormControl isRequired>
+        <FormControl>
           <FormLabel>Bio</FormLabel>
           <Input
             placeholder="Your bio."
             value={inputs.bio}
 			onChange={(e) => setInputs({ ...inputs, bio: e.target.value })}
             _placeholder={{ color: 'gray.500' }}
-            type="email"
+            type="text"
           />
         </FormControl>
-        <FormControl isRequired>
+        <FormControl>
           <FormLabel>Password</FormLabel>
           <Input
             placeholder="password"
@@ -129,11 +154,14 @@ export default function UpdateProfilePage() {
             w="full"
             _hover={{
               bg: 'blue.500',
-            }}>
+            }}
+            type='submit'
+            >
             Submit
           </Button>
         </Stack>
       </Stack>
     </Flex>
+    </form>
   )
 }
