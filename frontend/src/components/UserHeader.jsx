@@ -13,6 +13,7 @@ const UserHeader = ({user}) => {
     const currentUser = useRecoilValue(userAtom); //tohle je prihlaseny uzivatel
     const [following, setFollowing] = useState(user.followers.includes(currentUser._id))
     const showToast = useShowToast();
+    const [updating, setUpdating] = useState(false);
 
     const copyURL = () => {
         const currentURL = window.location.href;
@@ -28,6 +29,11 @@ const UserHeader = ({user}) => {
     };
 
     const handleFollowUnfollow = async() => {
+        if(!currentUser){
+            showToast("Error", "Please login to follow", "error");
+            return;
+        }
+        setUpdating(true);
         try {
             const res = await fetch(`/api/users/follow/${user._id}`,{
                 method: "POST",
@@ -40,9 +46,20 @@ const UserHeader = ({user}) => {
                 showToast("Error", data.error, "error");
             return;
         }
+        if(following){
+            showToast("Success", `Unfollowed ${user.name}`, "success");
+            user.followers.pop();                                               //simuluje oddelani z followers jenom client sided
+        } else {
+            showToast("Success", `Followed ${user.name}`, "success");
+            user.followers.push(currentUser._id);                               //simuluje pridani followers jenom client sided
+        }
+        setFollowing(!following);
+
             console.log(data)
         } catch (error) {
             showToast("Error", error, "error");
+        } finally {
+            setUpdating(false);
         }
     }
 
@@ -92,7 +109,7 @@ const UserHeader = ({user}) => {
             </Link>
         )}
          {currentUser._id !== user._id && (
-                <Button size={"sm"} onClick={handleFollowUnfollow}>
+                <Button size={"sm"} onClick={handleFollowUnfollow} isLoading={updating}>
                     {following ? "Unfollow" : "Follow"}
                 </Button>
             
