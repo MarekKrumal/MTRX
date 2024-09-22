@@ -33,6 +33,8 @@ const UserHeader = ({user}) => {
             showToast("Error", "Please login to follow", "error");
             return;
         }
+        if (updating) return;
+
         setUpdating(true);
         try {
             const res = await fetch(`/api/users/follow/${user._id}`,{
