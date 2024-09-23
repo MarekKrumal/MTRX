@@ -6,7 +6,7 @@ import useShowToast from "../hooks/useShowToast";
 import { formatDistanceToNow } from "date-fns";
 
 const Post = ({ post, postedBy}) => {
-    const [liked,setLiked] = useState(false);
+    
     const [user, setUser] = useState(null);
     const showToast = useShowToast();
     const navigate = useNavigate()
@@ -16,7 +16,7 @@ const Post = ({ post, postedBy}) => {
             try {
                 const res = await fetch("/api/users/profile/" + postedBy)
                 const data = await res.json()
-                console.log(data)
+                //console.log(data)
                 if(data.error){
                     showToast("Error", data.error, "error");
                     return;
@@ -114,14 +114,10 @@ const Post = ({ post, postedBy}) => {
             )}
 
             <Flex gap={3} my={1}>
-                <Actions liked={liked} setLiked={setLiked}/>
+                <Actions post={post}/>
             </Flex>
 
-            <Flex gap={2} alignItems={"center"}>
-                <Text color={"gray.light"} fontSize="sm">{post.replies.length} replies</Text>
-                <Box w={0.5} h={0.5} borderRadius={"full"} bg={"gray.light"}></Box>
-                <Text color={"gray.light"} fontSize="sm">{post.likes.length} likes</Text>
-            </Flex>
+            
             </Flex>
         </Flex>
     </Link>
