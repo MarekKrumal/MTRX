@@ -14,6 +14,7 @@ import postsAtom from "../atoms/postsAtom";
 const PostPage = () => {
 	const { user, loading } = useGetUserProfile();
 	const [posts, setPosts] = useRecoilState(postsAtom);
+	
 	const showToast = useShowToast();
 	const { pid } = useParams();
 	const currentUser = useRecoilValue(userAtom);
@@ -31,6 +32,7 @@ const PostPage = () => {
 					showToast("Error", data.error, "error");
 					return;
 				}
+				//console.log(data)
 				setPosts([data]);
 			} catch (error) {
 				showToast("Error", error.message, "error");

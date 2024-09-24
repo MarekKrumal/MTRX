@@ -172,6 +172,18 @@ const updateUser = async (req, res) => {
 
 		user = await user.save();
 
+		// najdi vsechny posts na ketere tento user odpovedel a updejtni username a userProfilePic fields
+		await Post.updateMany(
+			{ "replies.userId": userId },
+			{
+				$set: {
+					"replies.$[reply].username": user.username,
+					"replies.$[reply].userProfilePic": user.profilePic,
+				},
+			},
+			{ arrayFilters: [{ "reply.userId": userId }] }
+		);
+
 		// password by melo byt null (nemeli bychom ho posilat pri updejtu profilu[bio, ProfilePic])
 		user.password = null;
 
