@@ -46,99 +46,79 @@ const ChatPage = () => {
 
 
 	useEffect(() => {
-        const fetchMessages = async () => {
-            if (selectedConversation._id) {
-                try {
-                    const res = await fetch(`/api/messages/${selectedConversation._id}`);
-                    const data = await res.json();
-                    console.log("Fetched messages:", data); // Log pro debug
-                    if (data.error) {
-                        showToast("Error", data.error, "error");
-                        return;
-                    }
-                    setMessages(data.messages); // Nastavení zpráv do stavu
-                } catch (error) {
-                    showToast("Error", error.message, "error");
-                }
-            }
-        };
+		const getConversations = async () => {
+			try {
+				const res = await fetch("/api/messages/conversations");
+				const data = await res.json();
+				if (data.error) {
+					showToast("Error", data.error, "error");
+					return;
+				}
+				console.log(data);
+				setConversations(data);
+			} catch (error) {
+				showToast("Error", error.message, "error");
+			} finally {
+				setLoadingConversations(false);
+			}
+		};
 
-        fetchMessages(); // Zavolání funkce pro načtení zpráv
-    }, [selectedConversation]); // Spustí se při změně vybrané konverzace
+		getConversations();
+	}, [showToast, setConversations]);
 
-    useEffect(() => {
-        const getConversations = async () => {
-            try {
-                const res = await fetch("/api/messages/conversations");
-                const data = await res.json();
-                if (data.error) {
-                    showToast("Error", data.error, "error");
-                    return;
-                }
-                setConversations(data);
-            } catch (error) {
-                showToast("Error", error.message, "error");
-            } finally {
-                setLoadingConversations(false);
-            }
-        };
+	const handleConversationSearch = async (e) => {
+		e.preventDefault();
+		setSearchingUser(true);
+		try {
+			const res = await fetch(`/api/users/profile/${searchText}`);
+			const searchedUser = await res.json();
+			if (searchedUser.error) {
+				showToast("Error", searchedUser.error, "error");
+				return;
+			}
 
-        getConversations();
-    }, [showToast, setConversations]);
+			const messagingYourself = searchedUser._id === currentUser._id;
+			if (messagingYourself) {
+				showToast("Error", "You cannot message yourself", "error");
+				return;
+			}
 
-    const handleConversationSearch = async (e) => {
-        e.preventDefault();
-        setSearchingUser(true);
-        try {
-            const res = await fetch(`/api/users/profile/${searchText}`);
-            const searchedUser = await res.json();
-            if (searchedUser.error) {
-                showToast("Error", searchedUser.error, "error");
-                return;
-            }
+			const conversationAlreadyExists = conversations.find(
+				(conversation) => conversation.participants[0]._id === searchedUser._id
+			);
 
-            const messagingYourself = searchedUser._id === currentUser._id;
-            if (messagingYourself) {
-                showToast("Error", "You cannot message yourself", "error");
-                return;
-            }
+			if (conversationAlreadyExists) {
+				setSelectedConversation({
+					_id: conversationAlreadyExists._id,
+					userId: searchedUser._id,
+					username: searchedUser.username,
+					userProfilePic: searchedUser.profilePic,
+				});
+				return;
+			}
 
-            const conversationAlreadyExists = conversations.find(
-                (conversation) => conversation.participants[0]._id === searchedUser._id
-            );
-
-            if (conversationAlreadyExists) {
-                setSelectedConversation({
-                    _id: conversationAlreadyExists._id,
-                    userId: searchedUser._id,
-                    username: searchedUser.username,
-                    userProfilePic: searchedUser.profilePic,
-                });
-                return;
-            }
-
-            const mockConversation = {
-                mock: true,
-                lastMessage: {
-                    text: "",
-                    sender: "",
-                },
-                _id: Date.now(),
-                participants: [
-                    {
-                        _id: searchedUser._id,
-                        username: searchedUser.username,
-                        profilePic: searchedUser.profilePic,
-                    },
-                ],
-            };
-            setConversations((prevConvs) => [...prevConvs, mockConversation]);
-        } catch (error) {
-            showToast("Error", error.message, "error");
-        } finally {
-            setSearchingUser(false);
-        }
-    };
+			const mockConversation = {
+				mock: true,
+				lastMessage: {
+					text: "",
+					sender: "",
+				},
+				_id: Date.now(),
+				participants: [
+					{
+						_id: searchedUser._id,
+						username: searchedUser.username,
+						profilePic: searchedUser.profilePic,
+					},
+				],
+			};
+			setConversations((prevConvs) => [...prevConvs, mockConversation]);
+		} catch (error) {
+			showToast("Error", error.message, "error");
+		} finally {
+			setSearchingUser(false);
+		}
+	};
 
     return (
         <Box

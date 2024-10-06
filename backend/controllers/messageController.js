@@ -92,7 +92,7 @@ async function getConversations(req, res) {
 	const userId = req.user._id;
 
 	// Log pro debugování
-	console.log("Current userId:", userId);
+	//console.log("Current userId:", userId);
 
 	try {
 		const conversations = await Conversation.find({ participants: userId }).populate({

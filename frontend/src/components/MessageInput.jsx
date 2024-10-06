@@ -23,7 +23,7 @@ const MessageInput = ({ setMessages }) => {
                 },
                 body: JSON.stringify({
                     message: messageText,
-                    recepientId: selectedConversation.userId,
+                    recipientId: selectedConversation.userId,
                 }),
             });
             const data = await res.json();
