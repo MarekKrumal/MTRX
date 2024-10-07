@@ -42,7 +42,7 @@ const MessageContainer = () => {
         };
 
         getMessages();
-    }, [showToast, selectedConversation]);
+    }, [showToast, selectedConversation.userId, selectedConversation.mock]);
 
     // Real-time updates for new messages
     useEffect(() => {
